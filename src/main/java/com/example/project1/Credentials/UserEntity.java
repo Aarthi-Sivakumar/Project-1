@@ -17,10 +17,8 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column
-    @NotBlank(message = "Firstname is mandatory")
     private String firstname;
     @Column
-    @NotBlank(message = "Lastname is mandatory")
     private String lastname;
     @Column
     @NotBlank(message = "Mail is mandatory")
@@ -30,7 +28,6 @@ public class UserEntity {
     @NotBlank(message = "Password is mandatory")
     private String password;
     @Column
-    @NotBlank(message = "Gender is mandatory")
     private String gender;
     @JsonFormat(pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern = "yyyy-MM-dd")

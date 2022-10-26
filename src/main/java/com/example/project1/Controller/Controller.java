@@ -64,18 +64,16 @@ public class Controller {
         return "Successfully registered";
     }
     @PostMapping("/confirm-account")
-    public Object confirmUserAccount(@RequestParam("token")String tokenVerification)
-    {
-        TokenEntity token=null;
+    public Object confirmUserAccount(@RequestParam("token")String tokenVerification) {
+        TokenEntity token = null;
         List<TokenEntity> all = (List<TokenEntity>) tokenRepository.findAll();
-        for (TokenEntity tokenObj:all) {
-            if(tokenObj.getConfirmationtoken()!=null && tokenObj.getConfirmationtoken().equals(tokenVerification)){
-                token =  tokenObj;
+        for (TokenEntity tokenObj : all) {
+            if (tokenObj.getConfirmationtoken() != null && tokenObj.getConfirmationtoken().equals(tokenVerification)) {
+                token = tokenObj;
                 break;
             }
         }
-        if(token != null)
-        {
+        if (token != null) {
             Long userId = token.getUserEntity().getId();
             Optional<UserEntity> byId = loginRepository.findById(userId);
             byId.get().setEnabled(true);
@@ -84,5 +82,18 @@ public class Controller {
         }
         return "The link is invalid or broken!";
 
+    }
+    @PostMapping("/login")
+    public Object login(@RequestBody UserEntity userEntity){
+        UserEntity existing = loginRepository.findByEmailIdIgnoreCase(userEntity.getMail());
+        if(existing!=null){
+            String encodedpassword = loginRepository.findByEmailIdIgnoreCase(userEntity.getMail()).getPassword();
+            BCryptPasswordEncoder bCryptPasswordEncoder=new BCryptPasswordEncoder();
+            if(bCryptPasswordEncoder.matches(userEntity.getPassword(), encodedpassword)){
+                return loginRepository.findByEmailIdIgnoreCase(userEntity.getMail()).getFirstname()+" logged in Successfully";
+            }
+
+        }
+        return "Incorrect mailid / password";
     }
 }

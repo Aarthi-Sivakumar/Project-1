@@ -2,6 +2,7 @@ package com.example.project1.Repositories;
 
 import com.example.project1.Credentials.UserEntity;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,4 +19,5 @@ public interface LoginRepository extends CrudRepository<UserEntity,Long> {
         }
         return null;
     }
+
 }
