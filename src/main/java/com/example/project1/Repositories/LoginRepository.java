@@ -1,5 +1,6 @@
 package com.example.project1.Repositories;
 
+import com.example.project1.Credentials.TokenEntity;
 import com.example.project1.Credentials.UserEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

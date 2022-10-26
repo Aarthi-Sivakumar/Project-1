@@ -9,7 +9,6 @@ import com.example.project1.Service.PasswordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,8 +28,6 @@ public class Controller {
     EmailSenderService emailSenderService;
     @Autowired
     PasswordService passwordService;
-    PasswordEncoder passwordEncoder;
-
     @Autowired
     public Controller(PasswordService passwordRepo) {
         this.passwordService = passwordRepo;
@@ -95,5 +92,48 @@ public class Controller {
 
         }
         return "Incorrect mailid / password";
+    }
+
+    @PostMapping("/forgot-password")
+    public Object forgotpasword(@RequestBody UserEntity userEntity){
+        UserEntity existing = loginRepository.findByEmailIdIgnoreCase(userEntity.getMail());
+        if(existing!=null){
+            TokenEntity tokenVerification = new TokenEntity(existing);
+            tokenRepository.save(tokenVerification);
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
+            mailMessage.setTo(existing.getMail());
+            mailMessage.setSubject("Complete Password Reset!");
+            mailMessage.setFrom("aarthisivakumarr@gmail.com");
+            mailMessage.setText("To complete the password reset process, please click here: "
+                    + "http://localhost:8080/confirm-reset?token="+tokenVerification.getConfirmationtoken());
+            emailSenderService.sendEmail(mailMessage);
+        }else{
+            return "Mail id does not exist";
+        }
+        return "Reset Password mail has been sent to your account";
+    }
+
+    @PostMapping("/confirm-reset")
+    public Object confirmreset(@RequestParam("token")String tokenVerification){
+        TokenEntity token=tokenRepository.findByConfirmationToken(tokenVerification);
+        if(token!=null){
+            UserEntity userEntity=loginRepository.findByEmailIdIgnoreCase(token.getUserEntity().getMail());
+            userEntity.setEnabled(true);
+            loginRepository.save(userEntity);
+        }else {
+            return "The link is invalid or broken";
+        }
+        return "The mail is verified, now you can reset the password";
+    }
+
+    @PostMapping("/reset-password")
+    public Object resetpassword(@RequestBody UserEntity userEntity){
+        if(userEntity.getMail()!=null){
+            UserEntity tokenuser=loginRepository.findByEmailIdIgnoreCase(userEntity.getMail());
+            BCryptPasswordEncoder bCryptPasswordEncoder=new BCryptPasswordEncoder();
+            tokenuser.setPassword(bCryptPasswordEncoder.encode(userEntity.getPassword()));
+            loginRepository.save(tokenuser);
+        }
+        return "Password successfully reset";
     }
 }

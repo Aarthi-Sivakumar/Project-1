@@ -16,24 +16,32 @@ public class UserEntity {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column
     private String firstname;
+
     @Column
     private String lastname;
+
     @Column
     @NotBlank(message = "Mail is mandatory")
     @Email
     private String mail;
+
     @Column
     @NotBlank(message = "Password is mandatory")
     private String password;
+
     @Column
     private String gender;
     @JsonFormat(pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dob;
+
     @Column
     private Boolean enabled;
+
+
 
     public Long getId() {
         return id;
@@ -98,4 +106,6 @@ public class UserEntity {
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
+
+
 }
